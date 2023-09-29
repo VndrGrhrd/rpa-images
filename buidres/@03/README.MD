@@ -1,7 +1,7 @@
 # imagem com as seguintes caracteristicas:
 
 ## Imagem base Debian 12 Stable
- - Node.js 16 (NodeSource)
+ - Node.js 18 (NodeSource)
  - XFCE (basic)
  - Firefox 102 (external source)
  - Firefox 114 (external souce)
