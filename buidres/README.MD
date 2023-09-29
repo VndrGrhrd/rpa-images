@@ -1,0 +1,1 @@
+# Para realizar o build escolha uma imagem utilize o comando docker-compose build

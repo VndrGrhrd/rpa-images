@@ -1,0 +1,61 @@
+# Usando a imagem base Debian 12 Stable (Bookworm)
+FROM debian:stable
+
+# Atualizar repositórios e instalar pacotes necessários
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    xfce4 xfce4-goodies \
+    x11vnc xvfb \
+    curl \
+    terminator && \
+    apt-get clean && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Download e instalação do Firefox 102
+RUN curl -O -L https://download-installer.cdn.mozilla.net/pub/firefox/releases/102.0/linux-x86_64/en-US/firefox-102.0.tar.bz2 && \
+    tar xvf firefox-102.0.tar.bz2 -C /opt/ && \
+    ln -s /opt/firefox/firefox /usr/local/bin/firefox102 && \
+    rm firefox-102.0.tar.bz2
+
+# Download e instalação do Firefox 114
+RUN curl -O -L https://download-installer.cdn.mozilla.net/pub/firefox/releases/114.0/linux-x86_64/en-US/firefox-114.0.tar.bz2 && \
+    tar xvf firefox-114.0.tar.bz2 -C /opt/ && \
+    ln -s /opt/firefox/firefox /usr/local/bin/firefox114 && \
+    rm firefox-114.0.tar.bz2
+
+# Download e instalação do Chromium 102
+RUN curl -O -L https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    dpkg -i google-chrome-stable_current_amd64.deb && \
+    apt-get install -f && \
+    rm google-chrome-stable_current_amd64.deb
+
+# Download e instalação do Chromium 114
+RUN curl -O -L https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    dpkg -i google-chrome-stable_current_amd64.deb && \
+    apt-get install -f && \
+    rm google-chrome-stable_current_amd64.deb
+
+# Configurando senha para acesso via VNC
+RUN mkdir ~/.vnc && \
+    x11vnc -storepasswd 294756 ~/.vnc/passwd
+
+# Configurações do ambiente
+ENV DISPLAY=:0 \
+    VNC_COL_DEPTH=24 \
+    VNC_RESOLUTION=1280x800
+
+# Criando um diretório de trabalho
+WORKDIR /app
+
+# Instalando o Node.js LTS e NPM (substituir versão conforme necessário)
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
+    apt-get install -y nodejs npm
+
+# Comando de inicialização
+CMD Xvfb $DISPLAY -screen 0 $VNC_RESOLUTION -ac +extension RANDR && \
+    xfce4-session & \
+    x11vnc -forever -usepw -create && \
+    terminator & \
+    firefox102 & firefox114 & chromium & chromium114 & tail -f /dev/null
+

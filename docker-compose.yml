@@ -1,0 +1,9 @@
+version: '3'
+services:
+  playwright:
+    image: rpaimage_debian:latest
+    ports:
+      - "6000:5900"
+    volumes:
+      - ./:/app
+

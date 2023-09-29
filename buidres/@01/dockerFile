@@ -1,0 +1,54 @@
+# Usando a imagem base Debian 12 Stable (Bookworm)
+FROM debian:stable
+
+# Atualizar repositórios e instalar pacotes necessários
+RUN apt-get update && \
+DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    x11-apps \
+    mesa-utils \
+    x11vnc \
+    libgl1-mesa-dri \
+    libgl1-mesa-glx \
+    libpulse0 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxi6 \
+    libxtst6 \
+    libxss1 \
+    libnss3 \
+    libasound2 \
+    firefox-esr \
+    curl \
+    chromium \
+    tasksel \
+    terminator && \
+    apt-get clean && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+#instalar o xfce
+RUN tasksel install xfce-desktop
+
+# Configurando senha para acesso via VNC
+RUN mkdir ~/.vnc && \
+    x11vnc -storepasswd 294756 ~/.vnc/passwd
+
+# Configurações do ambiente
+ENV DISPLAY=:0 \
+    VNC_COL_DEPTH=24 \
+    VNC_RESOLUTION=1280x800
+
+# Criando um diretório de trabalho
+WORKDIR /app
+
+# Instalando o Node.js LTS e NPM (substituir versão conforme necessário)
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
+    apt-get install -y nodejs npm
+
+# Comando de inicialização
+CMD Xvfb $DISPLAY -screen 0 $VNC_RESOLUTION -ac +extension RANDR && \
+    xfce4-session & \
+    x11vnc -forever -usepw -create && \
+    terminator & \  
+    firefox-esr & chromium & tail -f /dev/null
+

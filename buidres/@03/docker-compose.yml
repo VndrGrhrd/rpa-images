@@ -1,0 +1,11 @@
+version: '3'
+services:
+  rpaimage_debian:
+    build:
+      context: .
+      dockerfile: dockerFile
+    environment:
+      - VNC_PASSWORD=294756
+    ports:
+      - "5900:5900"
+
